@@ -24,6 +24,8 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .findByUsername(username)
                 .block();
 
+        if(user == null) return null;
+
         return new User(
                 user.getUsername(),
                 user.getPassword(),
