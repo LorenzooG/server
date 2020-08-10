@@ -50,16 +50,7 @@ public class SecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
                 .and()
 
                 // authorization filter
-                .addFilter(new JwtFilter(userDetailsService, jwtService, authenticationManager()))
-                .addFilter(configureUsernamePasswordAuthenticationFilter());
-    }
-
-    private UsernamePasswordAuthenticationFilter configureUsernamePasswordAuthenticationFilter() throws Exception {
-        UsernamePasswordAuthenticationFilter filter = new UsernamePasswordAuthenticationFilter();
-
-        filter.setAuthenticationManager(authenticationManager());
-
-        return filter;
+                .addFilter(new JwtFilter(userDetailsService, jwtService, authenticationManager()));
     }
 
     @Override
