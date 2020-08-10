@@ -4,6 +4,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import store.wckd.server.service.JwtService;
@@ -55,6 +56,8 @@ public class JwtFilter extends BasicAuthenticationFilter {
                 .decodeJwt(jwtTokenString)
                 .getSubject();
 
-        return new UsernamePasswordAuthenticationToken(username, jwtTokenString);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+
+        return new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword());
     }
 }
