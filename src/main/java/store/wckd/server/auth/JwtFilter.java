@@ -1,6 +1,11 @@
 package store.wckd.server.auth;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -17,10 +22,12 @@ public class JwtFilter extends BasicAuthenticationFilter {
     private static final String AUTHENTICATION_HEADER_PREFIX = "Bearer ";
 
     private UserDetailsService userDetailsService;
+    private Algorithm jwtAlgorithm;
 
-    public JwtFilter(UserDetailsService userDetailsService, AuthenticationManager authenticationManager) {
+    public JwtFilter(UserDetailsService userDetailsService, Algorithm jwtAlgorithm, AuthenticationManager authenticationManager) {
         super(authenticationManager);
         this.userDetailsService = userDetailsService;
+        this.jwtAlgorithm = jwtAlgorithm;
     }
 
     @Override
@@ -43,8 +50,9 @@ public class JwtFilter extends BasicAuthenticationFilter {
     }
 
     private Authentication getAuthenticationFromJwtToken(String jwtTokenString) {
-        // TODO
+        DecodedJWT jwt = JWT.decode(jwtTokenString);
+        String username = jwt.getPayload();
 
-        return null;
+        return new UsernamePasswordAuthenticationToken(username, jwt);
     }
 }

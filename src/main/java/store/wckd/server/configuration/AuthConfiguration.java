@@ -1,5 +1,7 @@
 package store.wckd.server.configuration;
 
+import com.auth0.jwt.algorithms.Algorithm;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,8 +28,16 @@ public class AuthConfiguration extends WebSecurityConfigurerAdapter {
 
     private final UserDetailsService userDetailsService;
 
+    private Algorithm jwtAlgorithm;
+
     public AuthConfiguration(UserDetailsServiceImpl userDetailsService) {
         this.userDetailsService = userDetailsService;
+    }
+
+    // will set lazy the jwt algorithm lazy
+    @Autowired
+    public void setupAlgorithm() {
+        this.jwtAlgorithm = Algorithm.HMAC512(secret);
     }
 
     @Override
@@ -46,7 +56,12 @@ public class AuthConfiguration extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
                 // authorization filter
-                .and().addFilter(new JwtFilter(userDetailsService, authenticationManager()));
+                .and().addFilter(new JwtFilter(userDetailsService, jwtAlgorithm, authenticationManager()));
+    }
+
+    @Bean("jwtAlgorithm")
+    public Algorithm jwtAlgorithmBean() {
+        return jwtAlgorithm;
     }
 
     @Bean("passwordEncoder")
