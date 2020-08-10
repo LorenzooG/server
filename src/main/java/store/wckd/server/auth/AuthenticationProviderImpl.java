@@ -5,6 +5,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -21,15 +22,24 @@ public class AuthenticationProviderImpl implements AuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        UsernamePasswordAuthenticationToken credentials = (UsernamePasswordAuthenticationToken) authentication;
-        UserDetails userDetails = userDetailsService.loadUserByUsername(credentials.getName());
+        SecurityContext securityContext = SecurityContextHolder.getContext();
+        Authentication contextAuthentication = securityContext.getAuthentication();
 
-        if(!passwordEncoder.matches(credentials.getCredentials().toString(), userDetails.getPassword()))
+        if(contextAuthentication != null) return contextAuthentication;
+
+        UsernamePasswordAuthenticationToken credentialsToken = (UsernamePasswordAuthenticationToken) authentication;
+        UserDetails userDetails = userDetailsService.loadUserByUsername(credentialsToken.getName());
+
+        Object credentials = credentialsToken.getCredentials();
+        if(credentials == null) credentials = "";
+
+        String password = userDetails.getPassword();
+        if(password == null) password = "";
+
+        if (!passwordEncoder.matches(credentials.toString(), password))
             throw new BadCredentialsException("Your password/username is incorrect!");
 
-        SecurityContextHolder
-                .getContext()
-                .setAuthentication(authentication);
+        securityContext.setAuthentication(authentication);
 
         return authentication;
     }
