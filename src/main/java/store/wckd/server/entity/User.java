@@ -2,7 +2,7 @@ package store.wckd.server.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
@@ -10,6 +10,7 @@ import javax.persistence.*;
 @Table(name = "users")
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class User {
 
     @Id
