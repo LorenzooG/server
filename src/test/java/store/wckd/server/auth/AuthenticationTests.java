@@ -11,12 +11,10 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import store.wckd.server.auth.filter.JwtFilter;
 import store.wckd.server.entity.User;
 import store.wckd.server.factory.Factory;
 import store.wckd.server.factory.UserFactory;
 import store.wckd.server.repository.UserRepository;
-import store.wckd.server.service.JwtService;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -26,13 +24,12 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class JwtFilterTests {
+public class AuthenticationTests {
 
     @MockBean
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    private final JwtService jwtService;
     private final Factory<User> userFactory;
     private final MockMvc mockMvc;
 
@@ -40,32 +37,15 @@ public class JwtFilterTests {
     private static final String TESTING_ENDPOINT = "/me";
 
     @Autowired
-    public JwtFilterTests(JwtService jwtService, MockMvc mockMvc, UserRepository userRepository) {
-        this.jwtService = jwtService;
+    public AuthenticationTests(MockMvc mockMvc, UserRepository userRepository) {
         this.mockMvc = mockMvc;
 
         userFactory = new UserFactory(userRepository);
     }
 
     @Test
-    @DisplayName("It should not use jwt token if request a route that is permitted")
-    public void testAuthenticationFilterNotActivate() throws Exception {
-        User user = userFactory.createOne().block();
-
-        assertNotNull(user);
-
-        MockHttpServletRequestBuilder request =
-                get("/")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON);
-
-        mockMvc.perform(request)
-                .andExpect(status().is(404));
-    }
-
-    @Test
-    @DisplayName("It should login when JWT Token is valid")
-    public void testAuthenticationFilter() throws Exception {
+    @DisplayName("It should login properly and return a valid jwt token to be used in the headers")
+    public void testLogin() throws Exception {
         when(passwordEncoder.matches(anyString(), anyString()))
                 .thenReturn(true);
 
@@ -73,18 +53,12 @@ public class JwtFilterTests {
 
         assertNotNull(user);
 
-        String jwtToken = jwtService.encodeJwt(user);
-        String userJson = objectMapper.writeValueAsString(user); // TODO: change to DTO
-
         MockHttpServletRequestBuilder request =
-                get(TESTING_ENDPOINT)
-                        .header(JwtFilter.AUTHENTICATION_HEADER, JwtFilter.AUTHENTICATION_HEADER_PREFIX + jwtToken)
+                post(String.format("/login?username=%s&password=%s", user.getUsername(), user.getPassword()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON);
 
         mockMvc.perform(request)
-                .andExpect(status().is(200))
-                .andExpect(content().json(userJson));
+                .andExpect(status().is(200));
     }
-
 }

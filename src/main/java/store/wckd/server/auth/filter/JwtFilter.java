@@ -1,4 +1,4 @@
-package store.wckd.server.auth;
+package store.wckd.server.auth.filter;
 
 import com.auth0.jwt.exceptions.JWTDecodeException;
 import org.springframework.security.authentication.AuthenticationManager;

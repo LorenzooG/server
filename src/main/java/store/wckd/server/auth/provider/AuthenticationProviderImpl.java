@@ -1,4 +1,4 @@
-package store.wckd.server.auth;
+package store.wckd.server.auth.provider;
 
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
