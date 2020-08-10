@@ -30,7 +30,7 @@ public class AuthenticationProviderImpl implements AuthenticationProvider {
 
         UsernamePasswordAuthenticationToken credentialsToken = (UsernamePasswordAuthenticationToken) authentication;
 
-        // find user by credentials's username
+        // find user by credentials' username
         UserDetails userDetails = userDetailsService.loadUserByUsername(credentialsToken.getName());
 
         Object credentials = credentialsToken.getCredentials();
