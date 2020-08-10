@@ -15,6 +15,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import store.wckd.server.auth.JwtFilter;
 import store.wckd.server.auth.UserDetailsServiceImpl;
+import store.wckd.server.service.JwtService;
 
 @Configuration
 @EnableWebSecurity
@@ -27,11 +28,13 @@ public class AuthConfiguration extends WebSecurityConfigurerAdapter {
     private int passwordEncoderStrength;
 
     private final UserDetailsService userDetailsService;
+    private final JwtService jwtService;
 
     private Algorithm jwtAlgorithm;
 
-    public AuthConfiguration(UserDetailsServiceImpl userDetailsService) {
+    public AuthConfiguration(UserDetailsServiceImpl userDetailsService, JwtService jwtService) {
         this.userDetailsService = userDetailsService;
+        this.jwtService = jwtService;
     }
 
     // will set lazy the jwt algorithm lazy
@@ -56,7 +59,7 @@ public class AuthConfiguration extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
                 // authorization filter
-                .and().addFilter(new JwtFilter(userDetailsService, authenticationManager()));
+                .and().addFilter(new JwtFilter(userDetailsService, jwtService, authenticationManager()));
     }
 
     @Bean("jwtAlgorithm")
