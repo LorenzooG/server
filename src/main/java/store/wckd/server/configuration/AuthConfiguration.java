@@ -80,7 +80,7 @@ public class AuthConfiguration extends WebSecurityConfigurerAdapter {
                 .eraseCredentials(true)
 
                 // authentication provider
-                .authenticationProvider(new AuthenticationProviderImpl());
+                .authenticationProvider(new AuthenticationProviderImpl(userDetailsService, passwordEncoder));
     }
 
     @Bean("jwtAlgorithm")
