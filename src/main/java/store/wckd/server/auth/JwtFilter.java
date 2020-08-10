@@ -1,5 +1,6 @@
 package store.wckd.server.auth;
 
+import com.auth0.jwt.exceptions.JWTDecodeException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -52,12 +53,17 @@ public class JwtFilter extends BasicAuthenticationFilter {
     }
 
     private Authentication getAuthenticationFromJwtToken(String jwtTokenString) {
-        String username = jwtService
-                .decodeJwt(jwtTokenString)
-                .getSubject();
+        try {
+            String username = jwtService
+                    .decodeJwt(jwtTokenString)
+                    .getSubject();
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
-        return new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword());
+            return new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword());
+        } catch (JWTDecodeException exception) {
+            // create an empty authentication token if has any error
+            return new UsernamePasswordAuthenticationToken("", "");
+        }
     }
 }
