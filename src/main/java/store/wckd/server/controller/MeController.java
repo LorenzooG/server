@@ -26,10 +26,8 @@ public class MeController {
 
         UsernamePasswordAuthenticationToken credentialsToken = (UsernamePasswordAuthenticationToken) authentication;
 
-        Object usernameNullable = credentialsToken.getPrincipal();
-        if(usernameNullable == null) usernameNullable = "";
-
-        String username = usernameNullable.toString();
+        Object usernameAsObject = credentialsToken.getPrincipal();
+        String username = usernameAsObject == null ? "" : usernameAsObject.toString();
 
         return userService.findByUsername(username).block();
     }

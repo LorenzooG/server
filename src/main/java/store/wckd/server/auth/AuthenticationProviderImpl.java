@@ -30,10 +30,8 @@ public class AuthenticationProviderImpl implements AuthenticationProvider {
 
         UsernamePasswordAuthenticationToken credentialsToken = (UsernamePasswordAuthenticationToken) authentication;
 
-        Object usernameNullable = credentialsToken.getPrincipal();
-        if (usernameNullable == null) usernameNullable = "";
-
-        String username = usernameNullable.toString();
+        Object usernameAsObject = credentialsToken.getPrincipal();
+        String username = usernameAsObject == null ? "" : usernameAsObject.toString();
 
         // find user by credentials' username
         UserDetails userDetails = userDetailsService.loadUserByUsername(username);

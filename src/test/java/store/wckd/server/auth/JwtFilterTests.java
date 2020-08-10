@@ -48,6 +48,22 @@ public class JwtFilterTests {
     }
 
     @Test
+    @DisplayName("It should not use jwt token if request a route that is permitted")
+    public void testAuthenticationFilterNotActivate() throws Exception {
+        User user = userFactory.createOne().block();
+
+        assertNotNull(user);
+
+        MockHttpServletRequestBuilder request =
+                get("/")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON);
+
+        mockMvc.perform(request)
+                .andExpect(status().is(404));
+    }
+
+    @Test
     @DisplayName("It should login when JWT Token is valid")
     public void testAuthenticationFilter() throws Exception {
         when(passwordEncoder.matches(anyString(), anyString()))
