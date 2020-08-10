@@ -21,12 +21,7 @@ public class MeController {
     public User me() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if(!(authentication instanceof UsernamePasswordAuthenticationToken))
-            throw new RuntimeException("Could not get the current session with that token");
-
-        UsernamePasswordAuthenticationToken credentialsToken = (UsernamePasswordAuthenticationToken) authentication;
-
-        Object usernameAsObject = credentialsToken.getPrincipal();
+        Object usernameAsObject = authentication.getPrincipal();
         String username = usernameAsObject == null ? "" : usernameAsObject.toString();
 
         return userService.findByUsername(username).block();
