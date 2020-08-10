@@ -1,8 +1,5 @@
-package store.wckd.server.configuration;
+package store.wckd.server.auth;
 
-import com.auth0.jwt.algorithms.Algorithm;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,40 +9,21 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import store.wckd.server.auth.AuthenticationProviderImpl;
-import store.wckd.server.auth.JwtFilter;
-import store.wckd.server.auth.UserDetailsServiceImpl;
 import store.wckd.server.service.JwtService;
 
 @Configuration
 @EnableWebSecurity
-public class AuthConfiguration extends WebSecurityConfigurerAdapter {
-
-    @Value("${jwt.secret}")
-    private String secret;
-
-    @Value("${password.encoder.strength}")
-    private int passwordEncoderStrength;
-
+public class SecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
     private final UserDetailsService userDetailsService;
     private final JwtService jwtService;
+    private final PasswordEncoder passwordEncoder;
 
-    private Algorithm jwtAlgorithm;
-    private PasswordEncoder passwordEncoder;
-
-    public AuthConfiguration(UserDetailsServiceImpl userDetailsService, JwtService jwtService) {
+    public SecurityConfigurerAdapter(UserDetailsServiceImpl userDetailsService, JwtService jwtService, PasswordEncoder passwordEncoder) {
         this.userDetailsService = userDetailsService;
         this.jwtService = jwtService;
-    }
-
-    // will set lazy the jwt algorithm lazy
-    @Autowired
-    public void setup() {
-        this.jwtAlgorithm = Algorithm.HMAC512(secret);
-        this.passwordEncoder = new BCryptPasswordEncoder(passwordEncoderStrength);
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -81,16 +59,6 @@ public class AuthConfiguration extends WebSecurityConfigurerAdapter {
 
                 // authentication provider
                 .authenticationProvider(new AuthenticationProviderImpl(userDetailsService, passwordEncoder));
-    }
-
-    @Bean("jwtAlgorithm")
-    public Algorithm jwtAlgorithmBean() {
-        return jwtAlgorithm;
-    }
-
-    @Bean("passwordEncoder")
-    public PasswordEncoder passwordEncoderBean() {
-        return passwordEncoder;
     }
 
     @Override
