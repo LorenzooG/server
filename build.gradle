@@ -35,6 +35,7 @@ dependencies {
 
     runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
     runtimeOnly 'org.postgresql:postgresql'
+    testRuntimeOnly 'com.h2database:h2'
 
     annotationProcessor 'org.projectlombok:lombok'
 
