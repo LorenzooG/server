@@ -6,7 +6,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import store.wckd.server.entity.User;
@@ -16,6 +18,8 @@ import store.wckd.server.repository.UserRepository;
 import store.wckd.server.service.JwtService;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -23,6 +27,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 public class JwtFilterTests {
+
+    @MockBean
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     private final JwtService jwtService;
     private final Factory<User> userFactory;
@@ -42,6 +50,9 @@ public class JwtFilterTests {
     @Test
     @DisplayName("It should login when JWT Token is valid")
     public void testAuthenticationFilter() throws Exception {
+        when(passwordEncoder.matches(anyString(), anyString()))
+                .thenReturn(true);
+
         User user = userFactory.createOne().block();
 
         assertNotNull(user);
