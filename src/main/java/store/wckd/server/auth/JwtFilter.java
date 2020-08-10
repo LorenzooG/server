@@ -15,8 +15,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class JwtFilter extends BasicAuthenticationFilter {
-    private static final String AUTHENTICATION_HEADER = "Authorization";
-    private static final String AUTHENTICATION_HEADER_PREFIX = "Bearer ";
+    public static final String AUTHENTICATION_HEADER = "Authorization";
+    public static final String AUTHENTICATION_HEADER_PREFIX = "Bearer ";
 
     private UserDetailsService userDetailsService;
     private JwtService jwtService;
