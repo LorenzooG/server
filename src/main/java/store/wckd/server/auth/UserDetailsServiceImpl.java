@@ -24,7 +24,7 @@ public class UserDetailsServiceImpl implements UserDetailsService {
                 .findByUsername(username)
                 .block();
 
-        if(user == null) return null;
+        if(user == null) throw new UsernameNotFoundException("The system could not find a user with username " + username);
 
         return new User(
                 user.getUsername(),
