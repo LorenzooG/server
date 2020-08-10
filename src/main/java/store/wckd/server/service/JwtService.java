@@ -15,7 +15,7 @@ public class JwtService {
     @Value("${jwt.issuer}")
     private String issuer;
 
-    private Algorithm jwtAlgorithm;
+    private final Algorithm jwtAlgorithm;
 
     public JwtService(Algorithm jwtAlgorithm) {
         this.jwtAlgorithm = jwtAlgorithm;
