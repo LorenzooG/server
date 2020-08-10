@@ -31,18 +31,21 @@ public class SecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
         http
                 // cors and csrf
                 .cors()
-                .and().csrf().disable()
+                .and()
+                .csrf().disable()
 
                 // authorization
                 .authorizeRequests()
                 .anyRequest().permitAll()
+                .and()
 
                 // session management
-                .and().sessionManagement()
+                .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                .and()
 
                 // authorization filter
-                .and().addFilter(new JwtFilter(userDetailsService, jwtService, authenticationManager()))
+                .addFilter(new JwtFilter(userDetailsService, jwtService, authenticationManager()))
                 .addFilter(new UsernamePasswordAuthenticationFilter());
     }
 
