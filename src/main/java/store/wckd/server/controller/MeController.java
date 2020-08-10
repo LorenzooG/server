@@ -28,7 +28,7 @@ public class MeController {
 
         UsernamePasswordAuthenticationToken credentialsToken = (UsernamePasswordAuthenticationToken) authentication;
 
-        Object usernameNullable = credentialsToken.getCredentials();
+        Object usernameNullable = credentialsToken.getName();
         if(usernameNullable == null) usernameNullable = "";
 
         String username = usernameNullable.toString();
