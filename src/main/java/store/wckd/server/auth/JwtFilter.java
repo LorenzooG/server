@@ -4,6 +4,7 @@ import com.auth0.jwt.exceptions.JWTDecodeException;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -41,13 +42,23 @@ public class JwtFilter extends BasicAuthenticationFilter {
             HttpServletResponse response,
             FilterChain chain
     ) throws IOException, ServletException {
-        String jwtToken = request.getHeader(AUTHENTICATION_HEADER);
+        try {
+            String jwtToken = request.getHeader(AUTHENTICATION_HEADER);
 
-        if(jwtToken == null) jwtToken = "";
+            if(jwtToken == null) jwtToken = "";
 
-        jwtToken = jwtToken.replace(AUTHENTICATION_HEADER_PREFIX, "");
+            jwtToken = jwtToken.replace(AUTHENTICATION_HEADER_PREFIX, "");
 
-        authenticationManager.authenticate(getAuthenticationFromJwtToken(jwtToken));
+            authenticationManager.authenticate(getAuthenticationFromJwtToken(jwtToken));
+        } catch (AuthenticationException exception) {
+            if(isIgnoreFailure()) {
+                chain.doFilter(request, response);
+            } else {
+                throw exception;
+            }
+
+            return;
+        }
 
         chain.doFilter(request, response);
     }
