@@ -26,18 +26,23 @@ public class AuthenticationProviderImpl implements AuthenticationProvider {
         Authentication contextAuthentication = securityContext.getAuthentication();
 
         // will search in the context authentication, if is not null then will use it instead of repeat the same process of check.
-        if(contextAuthentication != null) return contextAuthentication;
+        if (contextAuthentication != null) return contextAuthentication;
 
         UsernamePasswordAuthenticationToken credentialsToken = (UsernamePasswordAuthenticationToken) authentication;
 
+        Object usernameNullable = credentialsToken.getPrincipal();
+        if (usernameNullable == null) usernameNullable = "";
+
+        String username = usernameNullable.toString();
+
         // find user by credentials' username
-        UserDetails userDetails = userDetailsService.loadUserByUsername(credentialsToken.getName());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
         Object credentials = credentialsToken.getCredentials();
-        if(credentials == null) credentials = "";
+        if (credentials == null) credentials = "";
 
         String password = userDetails.getPassword();
-        if(password == null) password = "";
+        if (password == null) password = "";
 
         if (!passwordEncoder.matches(credentials.toString(), password))
             throw new BadCredentialsException("Your password/username is incorrect!");
