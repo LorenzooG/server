@@ -18,8 +18,7 @@ public class UserService {
     }
 
     public Flux<User> findAll(int page) {
-        // TODO: paginate the return
-        return userRepository.findAll();
+        return Flux.fromIterable(userRepository.findAll());
     }
 
     public Mono<User> create(UserCreateDTO userCreateDTO) {
@@ -29,15 +28,15 @@ public class UserService {
                 userCreateDTO.getPassword()
         );
 
-        return userRepository.save(user);
+        return Mono.just(userRepository.save(user));
     }
 
     public Mono<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+        return Mono.just(userRepository.findByUsername(username));
     }
 
     public Mono<User> findById(long id) {
-        return userRepository.findById(id);
+        return Mono.justOrEmpty(userRepository.findById(id));
     }
 
     public Mono<User> updateById(long id, UserUpdateDTO userUpdateDTO) {
@@ -48,11 +47,13 @@ public class UserService {
                 userUpdateDTO.getPassword()
         );
 
-        return userRepository.save(user);
+        return Mono.just(userRepository.save(user));
     }
 
     public Mono<Void> deleteById(long id) {
-        return userRepository.deleteById(id);
+        userRepository.deleteById(id);
+
+        return Mono.empty();
     }
 
 }

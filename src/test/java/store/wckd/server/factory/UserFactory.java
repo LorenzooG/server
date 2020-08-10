@@ -22,10 +22,10 @@ public class UserFactory implements Factory<User> {
 
     @Override
     public Mono<User> createOne() {
-        return userRepository.save(new User(
+        return Mono.just(userRepository.save(new User(
                 "fake username",
                 "fake email",
                 "fake password"
-        ));
+        )));
     }
 }
