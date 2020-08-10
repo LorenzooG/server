@@ -56,7 +56,7 @@ public class AuthConfiguration extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
                 // authorization filter
-                .and().addFilter(new JwtFilter(userDetailsService, jwtAlgorithm, authenticationManager()));
+                .and().addFilter(new JwtFilter(userDetailsService, authenticationManager()));
     }
 
     @Bean("jwtAlgorithm")

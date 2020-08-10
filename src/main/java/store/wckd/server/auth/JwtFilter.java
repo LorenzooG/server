@@ -1,15 +1,12 @@
 package store.wckd.server.auth;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import store.wckd.server.service.JwtService;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -22,12 +19,16 @@ public class JwtFilter extends BasicAuthenticationFilter {
     private static final String AUTHENTICATION_HEADER_PREFIX = "Bearer ";
 
     private UserDetailsService userDetailsService;
-    private Algorithm jwtAlgorithm;
+    private JwtService jwtService;
 
-    public JwtFilter(UserDetailsService userDetailsService, Algorithm jwtAlgorithm, AuthenticationManager authenticationManager) {
+    public JwtFilter(
+            UserDetailsService userDetailsService,
+            JwtService jwtService,
+            AuthenticationManager authenticationManager
+    ) {
         super(authenticationManager);
         this.userDetailsService = userDetailsService;
-        this.jwtAlgorithm = jwtAlgorithm;
+        this.jwtService = jwtService;
     }
 
     @Override
@@ -50,9 +51,10 @@ public class JwtFilter extends BasicAuthenticationFilter {
     }
 
     private Authentication getAuthenticationFromJwtToken(String jwtTokenString) {
-        DecodedJWT jwt = JWT.decode(jwtTokenString);
-        String username = jwt.getPayload();
+        String username = jwtService
+                .decodeJwt(jwtTokenString)
+                .getSubject();
 
-        return new UsernamePasswordAuthenticationToken(username, jwt);
+        return new UsernamePasswordAuthenticationToken(username, jwtTokenString);
     }
 }
