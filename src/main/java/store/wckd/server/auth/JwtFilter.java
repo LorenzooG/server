@@ -18,9 +18,9 @@ public class JwtFilter extends BasicAuthenticationFilter {
     public static final String AUTHENTICATION_HEADER = "Authorization";
     public static final String AUTHENTICATION_HEADER_PREFIX = "Bearer ";
 
-    private UserDetailsService userDetailsService;
-    private JwtService jwtService;
-    private AuthenticationManager authenticationManager;
+    private final UserDetailsService userDetailsService;
+    private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
 
     public JwtFilter(
             UserDetailsService userDetailsService,
