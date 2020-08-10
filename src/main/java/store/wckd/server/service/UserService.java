@@ -32,7 +32,7 @@ public class UserService {
     }
 
     public Mono<User> findByUsername(String username) {
-        return Mono.just(userRepository.findByUsername(username));
+        return Mono.justOrEmpty(userRepository.findByUsername(username));
     }
 
     public Mono<User> findById(long id) {
