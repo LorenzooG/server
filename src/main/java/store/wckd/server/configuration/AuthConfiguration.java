@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -13,6 +14,8 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import store.wckd.server.auth.AuthenticationProviderImpl;
 import store.wckd.server.auth.JwtFilter;
 import store.wckd.server.auth.UserDetailsServiceImpl;
 import store.wckd.server.service.JwtService;
@@ -31,6 +34,7 @@ public class AuthConfiguration extends WebSecurityConfigurerAdapter {
     private final JwtService jwtService;
 
     private Algorithm jwtAlgorithm;
+    private PasswordEncoder passwordEncoder;
 
     public AuthConfiguration(UserDetailsServiceImpl userDetailsService, JwtService jwtService) {
         this.userDetailsService = userDetailsService;
@@ -39,8 +43,9 @@ public class AuthConfiguration extends WebSecurityConfigurerAdapter {
 
     // will set lazy the jwt algorithm lazy
     @Autowired
-    public void setupAlgorithm() {
+    public void setup() {
         this.jwtAlgorithm = Algorithm.HMAC512(secret);
+        this.passwordEncoder = new BCryptPasswordEncoder(passwordEncoderStrength);
     }
 
     @Override
@@ -59,7 +64,23 @@ public class AuthConfiguration extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 
                 // authorization filter
-                .and().addFilter(new JwtFilter(userDetailsService, jwtService, authenticationManager()));
+                .and().addFilter(new JwtFilter(userDetailsService, jwtService, authenticationManager()))
+                .addFilter(new UsernamePasswordAuthenticationFilter());
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+        auth
+                // dao settings
+                .userDetailsService(userDetailsService)
+                .passwordEncoder(passwordEncoder)
+                .and()
+
+                // general settings
+                .eraseCredentials(true)
+
+                // authentication provider
+                .authenticationProvider(new AuthenticationProviderImpl());
     }
 
     @Bean("jwtAlgorithm")
@@ -69,7 +90,7 @@ public class AuthConfiguration extends WebSecurityConfigurerAdapter {
 
     @Bean("passwordEncoder")
     public PasswordEncoder passwordEncoderBean() {
-        return new BCryptPasswordEncoder(passwordEncoderStrength);
+        return passwordEncoder;
     }
 
     @Override

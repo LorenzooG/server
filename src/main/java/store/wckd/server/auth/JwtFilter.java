@@ -20,6 +20,7 @@ public class JwtFilter extends BasicAuthenticationFilter {
 
     private UserDetailsService userDetailsService;
     private JwtService jwtService;
+    private AuthenticationManager authenticationManager;
 
     public JwtFilter(
             UserDetailsService userDetailsService,
@@ -29,6 +30,7 @@ public class JwtFilter extends BasicAuthenticationFilter {
         super(authenticationManager);
         this.userDetailsService = userDetailsService;
         this.jwtService = jwtService;
+        this.authenticationManager = authenticationManager;
     }
 
     @Override
@@ -43,9 +45,7 @@ public class JwtFilter extends BasicAuthenticationFilter {
 
         jwtToken = jwtToken.replace(AUTHENTICATION_HEADER_PREFIX, "");
 
-        SecurityContextHolder
-                .getContext()
-                .setAuthentication(getAuthenticationFromJwtToken(jwtToken));
+        authenticationManager.authenticate(getAuthenticationFromJwtToken(jwtToken));
 
         chain.doFilter(request, response);
     }
