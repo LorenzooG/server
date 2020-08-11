@@ -61,13 +61,7 @@ public class JwtFilter extends BasicAuthenticationFilter {
 
     private Authentication getAuthenticationFromJwtToken(String jwtTokenString) {
         try {
-            String username = jwtService
-                    .decodeJwt(jwtTokenString)
-                    .getSubject();
-
-            User user = userService.findByUsername(username).block();
-
-            return new UsernamePasswordAuthenticationToken(user, "");
+            return new UsernamePasswordAuthenticationToken(jwtService.decodeJwtToUser(jwtTokenString), "");
         } catch (JWTDecodeException exception) {
             // create an empty authentication token if has any error
             return new UsernamePasswordAuthenticationToken("", "");

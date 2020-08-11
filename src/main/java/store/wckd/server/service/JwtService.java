@@ -15,21 +15,30 @@ public class JwtService {
     @Value("${jwt.issuer}")
     private String issuer;
 
+    private final UserService userService;
     private final Algorithm jwtAlgorithm;
 
-    public JwtService(Algorithm jwtAlgorithm) {
+    public JwtService(UserService userService, Algorithm jwtAlgorithm) {
+        this.userService = userService;
         this.jwtAlgorithm = jwtAlgorithm;
     }
 
-    public DecodedJWT decodeJwt(String jwtString) {
-        return JWT.decode(jwtString);
+    public User decodeJwtToUser(String jwtString) {
+        long id = 0;
+
+        try {
+            id = Long.parseLong(JWT.decode(jwtString).getSubject());
+        } catch (Exception ignored) {
+        }
+
+        return userService.findById(id).block();
     }
 
     public String encodeJwt(User user) {
         return JWT.create()
                 .withIssuedAt(Date.from(Instant.now()))
                 .withIssuer(issuer)
-                .withSubject(user.getUsername())
+                .withSubject(String.valueOf(user.getId()))
                 .sign(jwtAlgorithm);
     }
 
