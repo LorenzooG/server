@@ -5,6 +5,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import store.wckd.server.entity.User;
 import store.wckd.server.service.JwtService;
@@ -22,17 +23,11 @@ public class JwtFilter extends BasicAuthenticationFilter {
 
     private final UserService userService;
     private final JwtService jwtService;
-    private final AuthenticationManager authenticationManager;
 
-    public JwtFilter(
-            UserService userService,
-            JwtService jwtService,
-            AuthenticationManager authenticationManager
-    ) {
+    public JwtFilter(UserService userService, JwtService jwtService, AuthenticationManager authenticationManager) {
         super(authenticationManager);
         this.userService = userService;
         this.jwtService = jwtService;
-        this.authenticationManager = authenticationManager;
     }
 
     @Override
@@ -48,7 +43,9 @@ public class JwtFilter extends BasicAuthenticationFilter {
 
             jwtToken = jwtToken.replace(AUTHENTICATION_HEADER_PREFIX, "");
 
-            authenticationManager.authenticate(getAuthenticationFromJwtToken(jwtToken));
+            SecurityContextHolder
+                    .getContext()
+                    .setAuthentication(getAuthenticationFromJwtToken(jwtToken));
         } catch (AuthenticationException exception) {
             if(isIgnoreFailure()) {
                 chain.doFilter(request, response);
