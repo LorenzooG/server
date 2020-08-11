@@ -11,12 +11,14 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import reactor.core.publisher.Mono;
 import store.wckd.server.auth.filter.JwtFilter;
 import store.wckd.server.entity.User;
 import store.wckd.server.factory.Factory;
 import store.wckd.server.factory.UserFactory;
 import store.wckd.server.repository.UserRepository;
 import store.wckd.server.service.JwtService;
+import store.wckd.server.service.UserService;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -31,6 +33,10 @@ public class JwtFilterTests {
     @MockBean
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @MockBean
+    @Autowired
+    private UserService userService;
 
     private final JwtService jwtService;
     private final Factory<User> userFactory;
@@ -69,7 +75,12 @@ public class JwtFilterTests {
         when(passwordEncoder.matches(anyString(), anyString()))
                 .thenReturn(true);
 
-        User user = userFactory.createOne().block();
+        Mono<User> userMono = userFactory.createOne();
+
+        when(userService.findByUsername(anyString()))
+                .thenReturn(userMono);
+
+        User user = userMono.block();
 
         assertNotNull(user);
 
