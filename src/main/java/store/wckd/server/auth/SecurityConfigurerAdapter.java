@@ -12,8 +12,10 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import store.wckd.server.auth.filter.JwtFilter;
 import store.wckd.server.auth.provider.AuthenticationProviderImpl;
+import store.wckd.server.auth.session.SessionAuthenticationStrategyImpl;
 import store.wckd.server.auth.userdetailservice.UserDetailsServiceImpl;
 import store.wckd.server.service.JwtService;
 
@@ -51,7 +53,17 @@ public class SecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
                 .and()
 
                 // authorization filter
-                .addFilter(new JwtFilter(userDetailsService, jwtService, authenticationManager()));
+                .addFilter(new JwtFilter(userDetailsService, jwtService, authenticationManager()))
+                .addFilter(configureUsernamePasswordAuthenticationFilter());
+    }
+
+    public UsernamePasswordAuthenticationFilter configureUsernamePasswordAuthenticationFilter() throws Exception {
+        UsernamePasswordAuthenticationFilter filter = new UsernamePasswordAuthenticationFilter();
+
+        filter.setAuthenticationManager(authenticationManager());
+        filter.setSessionAuthenticationStrategy(new SessionAuthenticationStrategyImpl(jwtService));
+
+        return filter;
     }
 
     @Override
