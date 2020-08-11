@@ -32,6 +32,9 @@ public class AuthenticationProviderImpl implements AuthenticationProvider {
         UsernamePasswordAuthenticationToken credentialsToken = (UsernamePasswordAuthenticationToken) authentication;
 
         Object usernameAsObject = credentialsToken.getPrincipal();
+
+        if(usernameAsObject instanceof User) return credentialsToken;
+
         String username = usernameAsObject == null ? "" : usernameAsObject.toString();
 
         // find user by credentials' username
