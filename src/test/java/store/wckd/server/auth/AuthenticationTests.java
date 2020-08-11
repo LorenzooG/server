@@ -11,10 +11,12 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import reactor.core.publisher.Mono;
 import store.wckd.server.entity.User;
 import store.wckd.server.factory.Factory;
 import store.wckd.server.factory.UserFactory;
 import store.wckd.server.repository.UserRepository;
+import store.wckd.server.service.UserService;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -29,6 +31,10 @@ public class AuthenticationTests {
     @MockBean
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @MockBean
+    @Autowired
+    private UserService userService;
 
     private final Factory<User> userFactory;
     private final MockMvc mockMvc;
@@ -49,7 +55,12 @@ public class AuthenticationTests {
         when(passwordEncoder.matches(anyString(), anyString()))
                 .thenReturn(true);
 
-        User user = userFactory.createOne().block();
+        Mono<User> userMono = userFactory.createOne();
+
+        when(userService.findByUsername(anyString()))
+                .thenReturn(userMono);
+
+        User user = userMono.block();
 
         assertNotNull(user);
 
