@@ -5,10 +5,10 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import store.wckd.server.entity.User;
 import store.wckd.server.service.JwtService;
+import store.wckd.server.service.UserService;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -20,17 +20,17 @@ public class JwtFilter extends BasicAuthenticationFilter {
     public static final String AUTHENTICATION_HEADER = "Authorization";
     public static final String AUTHENTICATION_HEADER_PREFIX = "Bearer ";
 
-    private final UserDetailsService userDetailsService;
+    private final UserService userService;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
     public JwtFilter(
-            UserDetailsService userDetailsService,
+            UserService userService,
             JwtService jwtService,
             AuthenticationManager authenticationManager
     ) {
         super(authenticationManager);
-        this.userDetailsService = userDetailsService;
+        this.userService = userService;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
     }
@@ -68,9 +68,9 @@ public class JwtFilter extends BasicAuthenticationFilter {
                     .decodeJwt(jwtTokenString)
                     .getSubject();
 
-            UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+            User user = userService.findByUsername(username).block();
 
-            return new UsernamePasswordAuthenticationToken(userDetails.getUsername(), userDetails.getPassword());
+            return new UsernamePasswordAuthenticationToken(user, "");
         } catch (JWTDecodeException exception) {
             // create an empty authentication token if has any error
             return new UsernamePasswordAuthenticationToken("", "");

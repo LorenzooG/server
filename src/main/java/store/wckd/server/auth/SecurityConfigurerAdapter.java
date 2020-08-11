@@ -18,16 +18,19 @@ import store.wckd.server.auth.provider.AuthenticationProviderImpl;
 import store.wckd.server.auth.session.SessionAuthenticationStrategyImpl;
 import store.wckd.server.auth.userdetailservice.UserDetailsServiceImpl;
 import store.wckd.server.service.JwtService;
+import store.wckd.server.service.UserService;
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalAuthentication
 public class SecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
+    private final UserService userService;
     private final UserDetailsService userDetailsService;
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
 
-    public SecurityConfigurerAdapter(UserDetailsServiceImpl userDetailsService, JwtService jwtService, PasswordEncoder passwordEncoder) {
+    public SecurityConfigurerAdapter(UserService userService, UserDetailsServiceImpl userDetailsService, JwtService jwtService, PasswordEncoder passwordEncoder) {
+        this.userService = userService;
         this.userDetailsService = userDetailsService;
         this.jwtService = jwtService;
         this.passwordEncoder = passwordEncoder;
@@ -53,7 +56,7 @@ public class SecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
                 .and()
 
                 // authorization filter
-                .addFilter(new JwtFilter(userDetailsService, jwtService, authenticationManager()))
+                .addFilter(new JwtFilter(userService, jwtService, authenticationManager()))
                 .addFilter(configureUsernamePasswordAuthenticationFilter());
     }
 
@@ -78,7 +81,7 @@ public class SecurityConfigurerAdapter extends WebSecurityConfigurerAdapter {
                 .eraseCredentials(true)
 
                 // authentication provider
-                .authenticationProvider(new AuthenticationProviderImpl(userDetailsService, passwordEncoder));
+                .authenticationProvider(new AuthenticationProviderImpl(userService, passwordEncoder));
     }
 
     @Override

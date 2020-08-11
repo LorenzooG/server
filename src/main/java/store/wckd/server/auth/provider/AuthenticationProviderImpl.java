@@ -7,16 +7,17 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import store.wckd.server.entity.User;
+import store.wckd.server.service.UserService;
 
 public class AuthenticationProviderImpl implements AuthenticationProvider {
-    private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
+    private final UserService userService;
 
-    public AuthenticationProviderImpl(UserDetailsService userDetailsService, PasswordEncoder passwordEncoder) {
-        this.userDetailsService = userDetailsService;
+    public AuthenticationProviderImpl(UserService userService, PasswordEncoder passwordEncoder) {
+        this.userService = userService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -34,21 +35,22 @@ public class AuthenticationProviderImpl implements AuthenticationProvider {
         String username = usernameAsObject == null ? "" : usernameAsObject.toString();
 
         // find user by credentials' username
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        User user = userService.findByUsername(username).block();
+        if (user == null) throw new UsernameNotFoundException("Could not find a user with username " + username);
 
-        Object credentials = credentialsToken.getCredentials();
-        if (credentials == null) credentials = "";
-
-        String password = userDetails.getPassword();
+        Object password = credentialsToken.getCredentials();
         if (password == null) password = "";
 
-        if (!passwordEncoder.matches(credentials.toString(), password))
+        String hashedPassword = user.getPassword();
+        if (hashedPassword == null) hashedPassword = "";
+
+        if (!passwordEncoder.matches(password.toString(), hashedPassword))
             throw new BadCredentialsException("Your password/username is incorrect!");
 
         // set the authentication to the context
         securityContext.setAuthentication(authentication);
 
-        return authentication;
+        return new UsernamePasswordAuthenticationToken(user, password);
     }
 
     @Override
