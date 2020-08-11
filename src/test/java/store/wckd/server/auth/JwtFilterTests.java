@@ -74,7 +74,7 @@ public class JwtFilterTests {
         assertNotNull(user);
 
         String jwtToken = jwtService.encodeJwt(user);
-        String userJson = objectMapper.writeValueAsString(user); // TODO: change to DTO
+        String userJson = objectMapper.writeValueAsString(user.toDTO());
 
         MockHttpServletRequestBuilder request =
                 get(TESTING_ENDPOINT)
