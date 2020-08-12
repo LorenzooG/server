@@ -14,9 +14,6 @@ import org.springframework.http.MediaType
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
-import org.springframework.test.web.servlet.post
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import store.wckd.server.auth.filter.JwtFilter
 import store.wckd.server.entity.User
 import store.wckd.server.factory.Factory
@@ -64,7 +61,7 @@ class JwtFilterTests @Autowired constructor(
 
         val userMono = userFactory.createOne()
 
-        every(userService.findByUsername(anyString()))
+        every(userService.findById(anyLong()))
                 .thenReturn(userMono)
 
         val user = userMono.block()!!
