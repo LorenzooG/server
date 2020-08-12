@@ -13,9 +13,13 @@ class JwtAuthenticationManager(private val jwtService: JwtService) : ReactiveAut
             error("The authentication needs to be a JwtAuthentication to " +
                     "be handled by the application's AuthenticationManager")
 
-        authentication.copy(
-                principal = jwtService.decodeJwtToUser(authentication.credentials),
-                isAuthenticated = true
-        )
+        try {
+            authentication.copy(
+                    principal = jwtService.decodeJwtToUser(authentication.credentials),
+                    isAuthenticated = true
+            )
+        } catch (exception: Exception) {
+            authentication
+        }
     }
 }
