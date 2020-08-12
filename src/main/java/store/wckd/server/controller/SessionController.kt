@@ -15,6 +15,13 @@ import store.wckd.server.entity.User
 import store.wckd.server.service.JwtService
 import store.wckd.server.service.UserService
 
+/**
+ * Controller that controls all of session-related:
+ *  - Login [LOGIN_ENDPOINT]
+ *  - View current session [SESSION_ENDPOINT], get the current logged user
+ *  - Register TODO
+ *  - ...
+ */
 @RestController
 class SessionController(
         private val userService: UserService,
