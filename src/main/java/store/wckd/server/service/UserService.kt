@@ -3,8 +3,8 @@ package store.wckd.server.service
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.stereotype.Service
-import store.wckd.server.dto.UserCreateDTO
-import store.wckd.server.dto.UserUpdateDTO
+import store.wckd.server.dto.user.UserCreateDTO
+import store.wckd.server.dto.user.UserUpdateDTO
 import store.wckd.server.entity.User
 import store.wckd.server.exception.EntityNotFoundException
 import store.wckd.server.repository.UserRepository

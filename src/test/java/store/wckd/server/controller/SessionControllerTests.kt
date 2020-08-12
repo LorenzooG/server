@@ -18,9 +18,9 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.expectBody
 import store.wckd.server.auth.JwtAuthenticationConverter.Companion.AUTHORIZATION_HEADER_PREFIX
 import store.wckd.server.auth.JwtAuthenticationConverter.Companion.AUTHORIZATION_HEADER
-import store.wckd.server.dto.LoginRequestDTO
-import store.wckd.server.dto.LoginResponseDTO
-import store.wckd.server.dto.UserResponseDTO
+import store.wckd.server.dto.login.LoginRequestDTO
+import store.wckd.server.dto.login.LoginResponseDTO
+import store.wckd.server.dto.user.UserResponseDTO
 import store.wckd.server.entity.User
 import store.wckd.server.factory.Factory
 import store.wckd.server.factory.UserFactory

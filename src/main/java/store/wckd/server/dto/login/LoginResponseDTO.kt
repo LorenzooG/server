@@ -1,3 +1,3 @@
-package store.wckd.server.dto
+package store.wckd.server.dto.login
 
 class LoginResponseDTO(val jwtToken: String)

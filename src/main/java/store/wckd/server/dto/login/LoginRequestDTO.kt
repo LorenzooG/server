@@ -1,4 +1,4 @@
-package store.wckd.server.dto
+package store.wckd.server.dto.login
 
 data class LoginRequestDTO(
         val username: String,

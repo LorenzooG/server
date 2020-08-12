@@ -1,4 +1,4 @@
-package store.wckd.server.dto
+package store.wckd.server.dto.user
 
 data class UserResponseDTO (
     val id: Long,

@@ -1,6 +1,6 @@
 package store.wckd.server.entity
 
-import store.wckd.server.dto.UserResponseDTO
+import store.wckd.server.dto.user.UserResponseDTO
 import javax.persistence.*
 
 @Entity

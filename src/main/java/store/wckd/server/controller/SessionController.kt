@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
-import store.wckd.server.dto.LoginRequestDTO
-import store.wckd.server.dto.LoginResponseDTO
-import store.wckd.server.dto.UserResponseDTO
+import store.wckd.server.dto.login.LoginRequestDTO
+import store.wckd.server.dto.login.LoginResponseDTO
+import store.wckd.server.dto.user.UserResponseDTO
 import store.wckd.server.entity.User
 import store.wckd.server.service.JwtService
 import store.wckd.server.service.UserService
