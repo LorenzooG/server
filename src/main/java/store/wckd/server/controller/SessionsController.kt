@@ -17,7 +17,7 @@ import store.wckd.server.service.JwtService
 import store.wckd.server.service.UserService
 
 @RestController
-class MeController(
+class SessionsController(
         private val userService: UserService,
         private val jwtService: JwtService,
         private val passwordEncoder: PasswordEncoder
@@ -36,8 +36,8 @@ class MeController(
         return ResponseEntity.ok(LoginResponseDTO(jwtService.encodeJwt(user)))
     }
 
-    @GetMapping("/me")
-    fun me(): UserResponseDTO {
+    @GetMapping("/session")
+    fun session(): UserResponseDTO {
         val authentication = SecurityContextHolder.getContext().authentication
 
         return (authentication.principal as User).toDTO()
