@@ -1,32 +1,22 @@
-package store.wckd.server.factory;
+package store.wckd.server.factory
 
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import store.wckd.server.entity.User;
-import store.wckd.server.repository.UserRepository;
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+import store.wckd.server.entity.User
+import store.wckd.server.repository.UserRepository
 
-public class UserFactory implements Factory<User> {
-    private final UserRepository userRepository;
-
-    public UserFactory(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
-    @Override
-    public Flux<User> createMany(int amount) {
-        //noinspection ReactiveStreamsNullableInLambdaInTransform
+class UserFactory(private val userRepository: UserRepository) : Factory<User> {
+    override fun createMany(amount: Int): Flux<User> {
         return Flux
                 .range(1, amount)
-                .map(id -> createOne().block());
+                .map { createOne().block()!! }
     }
 
-    @Override
-    public Mono<User> createOne() {
-        return Mono.just(userRepository.save(new User(
-                0L,
-                "fake username",
-                "fake email",
-                "fake password"
-        )));
-    }
+    override fun createOne(): Mono<User> =
+            Mono.just(userRepository.save(User(
+                    username = "fake username",
+                    email = "fake email",
+                    password = "fake password"
+            )))
+
 }
