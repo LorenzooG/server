@@ -6,10 +6,14 @@ import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
+import org.springframework.security.authentication.ReactiveAuthenticationManager
+import org.springframework.security.config.web.server.SecurityWebFiltersOrder
 import org.springframework.security.config.web.server.ServerHttpSecurity
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.server.SecurityWebFilterChain
+import org.springframework.security.web.server.authentication.AuthenticationWebFilter
+import org.springframework.security.web.server.authentication.ServerAuthenticationConverter
 
 @Configuration
 class SecurityConfiguration {
@@ -36,17 +40,26 @@ class SecurityConfiguration {
     fun passwordEncoderBean() = passwordEncoder
 
     @Bean("securityWebFilter")
-    fun securityFilterChainBean(http: ServerHttpSecurity): SecurityWebFilterChain {
+    fun securityFilterChainBean(
+            http: ServerHttpSecurity,
+            jwtAuthenticationManager: ReactiveAuthenticationManager,
+            jwtAuthenticationConverter: ServerAuthenticationConverter
+    ): SecurityWebFilterChain {
+        val authenticationWebFilter = AuthenticationWebFilter(jwtAuthenticationManager).apply {
+            setServerAuthenticationConverter(jwtAuthenticationConverter)
+        }
+
         return http
                 .csrf { it.disable() }
                 .httpBasic { it.disable() }
                 .logout { it.disable() }
                 .formLogin { it.disable() }
                 .authorizeExchange { spec ->
-                    spec.pathMatchers(HttpMethod.GET, "/me").authenticated()
+                    spec.pathMatchers(HttpMethod.GET, "/session").authenticated()
 
                     spec.anyExchange().permitAll()
                 }
+                .addFilterAt(authenticationWebFilter, SecurityWebFiltersOrder.AUTHENTICATION)
                 .build()
     }
 }
