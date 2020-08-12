@@ -19,9 +19,7 @@ class JwtFilter(
 ) : BasicAuthenticationFilter(authenticationManager) {
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) {
         try {
-            val jwtToken = request
-                    .getHeader(AUTHENTICATION_HEADER)
-                    .toString()
+            val jwtToken = (request.getHeader(AUTHENTICATION_HEADER) ?: "")
                     .replace(AUTHENTICATION_HEADER_PREFIX, "")
 
             SecurityContextHolder
