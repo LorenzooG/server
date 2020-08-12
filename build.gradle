@@ -25,6 +25,7 @@ configurations {
 
 repositories {
     mavenCentral()
+    jcenter()
     maven { url 'https://dl.bintray.com/konrad-kaminski/maven' }
 }
 
@@ -44,7 +45,10 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
 //    implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    implementation 'io.springfox:springfox-swagger2:2.9.2'
+
+    implementation 'io.springfox:springfox-swagger2:3.0.0'
+    implementation 'io.springfox:springfox-swagger-ui:3.0.0'
+    implementation 'io.springfox:springfox-spring-webflux:3.0.0'
 
     implementation 'com.auth0:java-jwt:3.10.3'
 
