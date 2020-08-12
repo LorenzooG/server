@@ -16,7 +16,7 @@ import store.wckd.server.service.JwtService
 import store.wckd.server.service.UserService
 
 @RestController
-class SessionsController(
+class SessionController(
         private val userService: UserService,
         private val jwtService: JwtService,
         private val passwordEncoder: PasswordEncoder

@@ -14,7 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.server.SecurityWebFilterChain
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter
 import org.springframework.security.web.server.authentication.ServerAuthenticationConverter
-import store.wckd.server.controller.SessionsController
+import store.wckd.server.controller.SessionController
 
 @Configuration
 class SecurityConfiguration {
@@ -56,7 +56,7 @@ class SecurityConfiguration {
                 .logout { it.disable() }
                 .formLogin { it.disable() }
                 .authorizeExchange { spec ->
-                    spec.pathMatchers(HttpMethod.GET, SessionsController.SESSION_ENDPOINT).authenticated()
+                    spec.pathMatchers(HttpMethod.GET, SessionController.SESSION_ENDPOINT).authenticated()
 
                     spec.anyExchange().permitAll()
                 }

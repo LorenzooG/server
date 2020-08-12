@@ -18,7 +18,7 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.expectBody
 import store.wckd.server.auth.JwtAuthenticationConverter.Companion.AUTHORIZATION_HEADER_PREFIX
 import store.wckd.server.auth.JwtAuthenticationConverter.Companion.AUTHORIZATION_HEADER
-import store.wckd.server.controller.SessionsController
+import store.wckd.server.controller.SessionController
 import store.wckd.server.dto.LoginRequestDTO
 import store.wckd.server.dto.LoginResponseDTO
 import store.wckd.server.dto.UserResponseDTO
@@ -44,7 +44,7 @@ class SessionControllerTests @Autowired constructor(
     private val userFactory: Factory<User> = UserFactory(userRepository)
 
     @Test
-    @DisplayName("It should return the jwt token when request ${SessionsController.LOGIN_ENDPOINT} with correct credentials")
+    @DisplayName("It should return the jwt token when request ${SessionController.LOGIN_ENDPOINT} with correct credentials")
     fun testLogin() {
         every(passwordEncoder.matches(anyString(), anyString()))
                 .thenReturn(true)
@@ -52,7 +52,7 @@ class SessionControllerTests @Autowired constructor(
         val user = runBlocking { userFactory.createOne() }
 
         webTestClient.post()
-                .uri(SessionsController.LOGIN_ENDPOINT)
+                .uri(SessionController.LOGIN_ENDPOINT)
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .bodyValue(objectMapper.writeValueAsString(LoginRequestDTO(
@@ -71,13 +71,13 @@ class SessionControllerTests @Autowired constructor(
     }
 
     @Test
-    @DisplayName("It should return the current user when request ${SessionsController.SESSION_ENDPOINT} with correct JWT Token")
+    @DisplayName("It should return the current user when request ${SessionController.SESSION_ENDPOINT} with correct JWT Token")
     fun testAuthorization() {
         val user = runBlocking { userFactory.createOne() }
         val jwt = jwtService.encodeJwt(user)
 
         webTestClient.get()
-                .uri(SessionsController.SESSION_ENDPOINT)
+                .uri(SessionController.SESSION_ENDPOINT)
                 .header(AUTHORIZATION_HEADER, "$AUTHORIZATION_HEADER_PREFIX$jwt")
                 .accept(MediaType.APPLICATION_JSON)
                 .exchange()
