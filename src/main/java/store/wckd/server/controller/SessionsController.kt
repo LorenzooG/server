@@ -22,7 +22,12 @@ class SessionsController(
         private val jwtService: JwtService,
         private val passwordEncoder: PasswordEncoder
 ) {
-    @PostMapping("/login")
+    companion object {
+        const val LOGIN_ENDPOINT = "/login"
+        const val SESSION_ENDPOINT = "/session"
+    }
+
+    @PostMapping(LOGIN_ENDPOINT)
     suspend fun login(@RequestBody body: LoginRequestDTO): ResponseEntity<*> {
         val user: User = userService.findByUsername(body.username).awaitSingle()
 
@@ -36,7 +41,7 @@ class SessionsController(
         return ResponseEntity.ok(LoginResponseDTO(jwtService.encodeJwt(user)))
     }
 
-    @GetMapping("/session")
+    @GetMapping(SESSION_ENDPOINT)
     fun session(): UserResponseDTO {
         val authentication = SecurityContextHolder.getContext().authentication
 
