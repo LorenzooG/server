@@ -8,6 +8,9 @@ import store.wckd.server.entity.User
 import java.time.Instant
 import java.util.*
 
+/**
+ * Encodes and decodes JWT based in a user
+ */
 @Service
 class JwtService(
         private val userService: UserService,
@@ -16,6 +19,11 @@ class JwtService(
     @Value("\${jwt.issuer}")
     private lateinit var issuer: String
 
+    /**
+     * Decodes a jwt and find a user based in id found in that
+     *
+     * @return the found user
+     */
     suspend fun decodeJwtToUser(jwt: String): User =
             JWT.decode(jwt)
                     .subject
@@ -24,6 +32,11 @@ class JwtService(
                         userService.findById(it ?: 0)
                     }
 
+    /**
+     * Encodes a jwt based on user [user]
+     *
+     * @return the encoded string jwt
+     */
     fun encodeJwt(user: User): String =
             JWT.create()
                     .withIssuedAt(Date.from(Instant.now()))
