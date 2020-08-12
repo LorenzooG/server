@@ -10,13 +10,15 @@ import org.springframework.security.authentication.ReactiveAuthenticationManager
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder
 import org.springframework.security.config.web.server.ServerHttpSecurity
 import org.springframework.security.crypto.argon2.Argon2PasswordEncoder
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.server.SecurityWebFilterChain
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter
 import org.springframework.security.web.server.authentication.ServerAuthenticationConverter
 import store.wckd.server.controller.SessionController
 
+/**
+ * Sets up the security-related configurations and beans
+ */
 @Configuration
 class SecurityConfiguration {
     @Value("\${jwt.secret}")
@@ -25,7 +27,7 @@ class SecurityConfiguration {
     private lateinit var jwtAlgorithm: Algorithm
     private lateinit var passwordEncoder: PasswordEncoder
 
-    // will set lazy the jwt algorithm lazy
+    /** will set lazy the jwt algorithm lazy */
     @Autowired
     fun setup() {
         jwtAlgorithm = Algorithm.HMAC512(secret)
@@ -38,6 +40,9 @@ class SecurityConfiguration {
     @Bean("passwordEncoder")
     fun passwordEncoderBean() = passwordEncoder
 
+    /**
+     * Setup security filter chain, the spring webflux security configuration
+     */
     @Bean("securityWebFilter")
     fun securityFilterChainBean(
             http: ServerHttpSecurity,
