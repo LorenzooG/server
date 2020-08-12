@@ -9,6 +9,7 @@ import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.ReactiveAuthenticationManager
 import org.springframework.security.config.web.server.SecurityWebFiltersOrder
 import org.springframework.security.config.web.server.ServerHttpSecurity
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.server.SecurityWebFilterChain
@@ -21,9 +22,6 @@ class SecurityConfiguration {
     @Value("\${jwt.secret}")
     private lateinit var secret: String
 
-    @Value("\${password.encoder.strength}")
-    private var passwordEncoderStrength = 8
-
     private lateinit var jwtAlgorithm: Algorithm
     private lateinit var passwordEncoder: PasswordEncoder
 
@@ -31,7 +29,7 @@ class SecurityConfiguration {
     @Autowired
     fun setup() {
         jwtAlgorithm = Algorithm.HMAC512(secret)
-        passwordEncoder = BCryptPasswordEncoder(passwordEncoderStrength)
+        passwordEncoder = Argon2PasswordEncoder()
     }
 
     @Bean("jwtAlgorithm")
