@@ -1,9 +1,6 @@
 package store.wckd.server.exception
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.reactive.awaitSingle
 import kotlinx.coroutines.reactor.mono
 import kotlinx.coroutines.withContext
@@ -12,13 +9,10 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
 import org.springframework.web.server.ServerWebExchange
 import reactor.kotlin.core.publisher.toMono
+import store.wckd.server.util.objectMapper
 
 @Configuration
 class ExceptionHandler : ErrorWebExceptionHandler {
-    companion object {
-        private val objectMapper = jacksonObjectMapper()
-    }
-
     override fun handle(exchange: ServerWebExchange, ex: Throwable) = mono {
         val response = exchange.response
 

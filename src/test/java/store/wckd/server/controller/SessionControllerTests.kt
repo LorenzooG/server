@@ -2,7 +2,6 @@
 
 package store.wckd.server.controller
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.DisplayName
@@ -26,6 +25,7 @@ import store.wckd.server.factory.Factory
 import store.wckd.server.factory.UserFactory
 import store.wckd.server.repository.UserRepository
 import store.wckd.server.service.JwtService
+import store.wckd.server.util.objectMapper
 import org.mockito.Mockito.`when` as every
 
 @SpringBootTest
@@ -82,9 +82,5 @@ class SessionControllerTests @Autowired constructor(
                 .exchange()
                 .expectStatus().isOk
                 .expectBody<UserResponseDTO>().isEqualTo(user.toDTO())
-    }
-
-    companion object {
-        private val objectMapper = jacksonObjectMapper()
     }
 }
