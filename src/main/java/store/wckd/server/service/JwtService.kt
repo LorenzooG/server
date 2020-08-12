@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service
 import store.wckd.server.entity.User
 import java.time.Instant
 import java.util.*
-import javax.persistence.EntityNotFoundException
 
 @Service
 class JwtService(
@@ -17,12 +16,12 @@ class JwtService(
     @Value("\${jwt.issuer}")
     private lateinit var issuer: String
 
-    fun decodeJwtToUser(jwt: String): User =
+    suspend fun decodeJwtToUser(jwt: String): User =
             JWT.decode(jwt)
                     .subject
                     .toLongOrNull()
                     .let {
-                        userService.findById(it ?: 0).block() ?: throw EntityNotFoundException()
+                        userService.findById(it ?: 0)
                     }
 
     fun encodeJwt(user: User): String =

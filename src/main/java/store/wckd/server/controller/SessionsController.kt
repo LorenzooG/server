@@ -29,7 +29,7 @@ class SessionsController(
 
     @PostMapping(LOGIN_ENDPOINT)
     suspend fun login(@RequestBody body: LoginRequestDTO): ResponseEntity<*> {
-        val user: User = userService.findByUsername(body.username).awaitSingle()
+        val user: User = userService.findByUsername(body.username)
 
         if(!passwordEncoder.matches(body.password, user.password))
             return ResponseEntity
