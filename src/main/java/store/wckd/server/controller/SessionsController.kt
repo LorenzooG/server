@@ -1,9 +1,8 @@
 package store.wckd.server.controller
 
-import kotlinx.coroutines.reactive.awaitSingle
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
-import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -42,9 +41,7 @@ class SessionsController(
     }
 
     @GetMapping(SESSION_ENDPOINT)
-    fun session(): UserResponseDTO {
-        val authentication = SecurityContextHolder.getContext().authentication
-
-        return (authentication.principal as User).toDTO()
+    suspend fun session(@AuthenticationPrincipal principal: User): UserResponseDTO {
+        return principal.toDTO()
     }
 }
