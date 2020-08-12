@@ -1,12 +1,7 @@
-package store.wckd.server.dto;
+package store.wckd.server.dto
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-@RequiredArgsConstructor
-@Getter
-public class UserCreateDTO {
-    private final String username;
-    private final String email;
-    private final String password;
-}
+data class UserCreateDTO(
+        val username: String,
+        val email: String,
+        val password: String
+)

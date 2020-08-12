@@ -1,63 +1,48 @@
-package store.wckd.server.auth.provider;
+package store.wckd.server.auth.provider
 
-import org.springframework.security.authentication.AuthenticationProvider;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import store.wckd.server.entity.User;
-import store.wckd.server.service.UserService;
+import org.springframework.security.authentication.AuthenticationProvider
+import org.springframework.security.authentication.BadCredentialsException
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.Authentication
+import org.springframework.security.core.AuthenticationException
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.UsernameNotFoundException
+import org.springframework.security.crypto.password.PasswordEncoder
+import store.wckd.server.entity.User
+import store.wckd.server.service.UserService
 
-public class AuthenticationProviderImpl implements AuthenticationProvider {
-    private final PasswordEncoder passwordEncoder;
-    private final UserService userService;
-
-    public AuthenticationProviderImpl(UserService userService, PasswordEncoder passwordEncoder) {
-        this.userService = userService;
-        this.passwordEncoder = passwordEncoder;
-    }
-
-    @Override
-    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        SecurityContext securityContext = SecurityContextHolder.getContext();
-        Authentication contextAuthentication = securityContext.getAuthentication();
+class AuthenticationProviderImpl(private val userService: UserService, private val passwordEncoder: PasswordEncoder) : AuthenticationProvider {
+    @Throws(AuthenticationException::class)
+    override fun authenticate(authentication: Authentication): Authentication {
+        val securityContext = SecurityContextHolder.getContext()
+        val contextAuthentication = securityContext.authentication
 
         // will search in the context authentication, if is not null then will use it instead of repeat the same process of check.
-        if (contextAuthentication != null) return contextAuthentication;
+        if (contextAuthentication != null) return contextAuthentication
 
-        UsernamePasswordAuthenticationToken credentialsToken = (UsernamePasswordAuthenticationToken) authentication;
+        val credentialsToken = authentication as UsernamePasswordAuthenticationToken
+        val principal = credentialsToken.principal
 
-        Object usernameAsObject = credentialsToken.getPrincipal();
+        if (principal is User) return credentialsToken
 
-        if(usernameAsObject instanceof User) return credentialsToken;
-
-        String username = usernameAsObject == null ? "" : usernameAsObject.toString();
+        val username = principal.toString()
 
         // find user by credentials' username
-        User user = userService.findByUsername(username).block();
-        if (user == null) throw new UsernameNotFoundException("Could not find a user with username " + username);
+        val user = userService.findByUsername(username).block()
+                ?: throw UsernameNotFoundException("Could not find a user with username $username")
 
-        Object password = credentialsToken.getCredentials();
-        if (password == null) password = "";
+        val password = credentialsToken.credentials ?: ""
 
-        String hashedPassword = user.getPassword();
-        if (hashedPassword == null) hashedPassword = "";
-
-        if (!passwordEncoder.matches(password.toString(), hashedPassword))
-            throw new BadCredentialsException("Your password/username is incorrect!");
+        if (!passwordEncoder.matches(password.toString(), user.password))
+            throw BadCredentialsException("Your password/username is incorrect!")
 
         // set the authentication to the context
-        securityContext.setAuthentication(authentication);
+        securityContext.authentication = authentication
 
-        return new UsernamePasswordAuthenticationToken(user, password);
+        return UsernamePasswordAuthenticationToken(user, password)
     }
 
-    @Override
-    public boolean supports(Class<?> authentication) {
-        return authentication.isAssignableFrom(UsernamePasswordAuthenticationToken.class);
-    }
+    override fun supports(authentication: Class<*>) =
+            authentication.isAssignableFrom(UsernamePasswordAuthenticationToken::class.java)
+
 }

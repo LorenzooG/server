@@ -1,52 +1,38 @@
-package store.wckd.server.auth.session;
+package store.wckd.server.auth.session
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.web.authentication.session.SessionAuthenticationException;
-import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
-import store.wckd.server.dto.LoginResponseDTO;
-import store.wckd.server.entity.User;
-import store.wckd.server.service.JwtService;
+import com.fasterxml.jackson.databind.ObjectMapper
+import org.springframework.security.core.Authentication
+import org.springframework.security.web.authentication.session.SessionAuthenticationException
+import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy
+import store.wckd.server.dto.LoginResponseDTO
+import store.wckd.server.entity.User
+import store.wckd.server.service.JwtService
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
+class SessionAuthenticationStrategyImpl(private val jwtService: JwtService) : SessionAuthenticationStrategy {
+    @Throws(SessionAuthenticationException::class)
+    override fun onAuthentication(
+            authentication: Authentication,
+            request: HttpServletRequest,
+            response: HttpServletResponse
+    ) {
+        val principal = authentication.principal ?: throw SessionAuthenticationException("Principal is null")
+        val user = principal as? User ?: throw SessionAuthenticationException("Principal is not user")
 
-public class SessionAuthenticationStrategyImpl implements SessionAuthenticationStrategy {
+        response.contentType = "application/json"
+        response.characterEncoding = "UTF-8"
 
-    private static final ObjectMapper objectMapper = new ObjectMapper();
+        val jwtString = jwtService.encodeJwt(user)
 
-    private final JwtService jwtService;
-
-    public SessionAuthenticationStrategyImpl(JwtService jwtService) {
-        this.jwtService = jwtService;
-    }
-
-    @Override
-    public void onAuthentication(
-            Authentication authentication,
-            HttpServletRequest request,
-            HttpServletResponse response
-    ) throws SessionAuthenticationException {
-        Object principal = authentication.getPrincipal();
-
-        if (principal == null)
-            throw new SessionAuthenticationException("Principal is null");
-
-        if (!(principal instanceof User))
-            throw new SessionAuthenticationException("Principal is not user");
-
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
-
-        String jwtString = jwtService.encodeJwt((User) principal);
-
-        try (PrintWriter writer = response.getWriter()) {
-            writer.print(objectMapper.writeValueAsString(new LoginResponseDTO(jwtString)));
-            writer.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
+        response.writer.use { writer ->
+            writer.print(objectMapper.writeValueAsString(LoginResponseDTO(jwtString)))
+            writer.flush()
         }
     }
+
+    companion object {
+        private val objectMapper = ObjectMapper()
+    }
+
 }

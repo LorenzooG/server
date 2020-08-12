@@ -1,39 +1,35 @@
-package store.wckd.server.configuration;
+package store.wckd.server.configuration
 
-import com.auth0.jwt.algorithms.Algorithm;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import com.auth0.jwt.algorithms.Algorithm
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.crypto.password.PasswordEncoder
+import kotlin.properties.Delegates
 
 @Configuration
-public class SecurityConfiguration {
-    @Value("${jwt.secret}")
-    private String secret;
+class SecurityConfiguration {
+    @Value("\${jwt.secret}")
+    private lateinit var secret: String
 
-    @Value("${password.encoder.strength}")
-    private int passwordEncoderStrength;
+    @Value("\${password.encoder.strength}")
+    private var passwordEncoderStrength = 8
 
-    private Algorithm jwtAlgorithm;
-    private PasswordEncoder passwordEncoder;
+    private lateinit var jwtAlgorithm: Algorithm
+    private lateinit var passwordEncoder: PasswordEncoder
 
     // will set lazy the jwt algorithm lazy
     @Autowired
-    public void setup() {
-        this.jwtAlgorithm = Algorithm.HMAC512(secret);
-        this.passwordEncoder = new BCryptPasswordEncoder(passwordEncoderStrength);
+    fun setup() {
+        jwtAlgorithm = Algorithm.HMAC512(secret)
+        passwordEncoder = BCryptPasswordEncoder(passwordEncoderStrength)
     }
 
     @Bean("jwtAlgorithm")
-    public Algorithm jwtAlgorithmBean() {
-        return jwtAlgorithm;
-    }
+    fun jwtAlgorithmBean() = jwtAlgorithm
 
     @Bean("passwordEncoder")
-    public PasswordEncoder passwordEncoderBean() {
-        return passwordEncoder;
-    }
-
+    fun passwordEncoderBean() = passwordEncoder
 }

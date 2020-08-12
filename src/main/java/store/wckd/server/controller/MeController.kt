@@ -1,20 +1,17 @@
-package store.wckd.server.controller;
+package store.wckd.server.controller
 
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-import store.wckd.server.dto.UserResponseDTO;
-import store.wckd.server.entity.User;
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.RestController
+import store.wckd.server.dto.UserResponseDTO
+import store.wckd.server.entity.User
 
 @RestController
-public class MeController {
-
+class MeController {
     @GetMapping("/me")
-    public UserResponseDTO me() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    fun me(): UserResponseDTO {
+        val authentication = SecurityContextHolder.getContext().authentication
 
-        return ((User) authentication.getPrincipal()).toDTO();
+        return (authentication.principal as User).toDTO()
     }
-
 }

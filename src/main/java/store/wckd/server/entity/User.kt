@@ -1,41 +1,25 @@
-package store.wckd.server.entity;
+package store.wckd.server.entity
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import store.wckd.server.dto.UserResponseDTO;
-
-import javax.persistence.*;
+import store.wckd.server.dto.UserResponseDTO
+import javax.persistence.*
 
 @Entity
 @Table(name = "users")
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class User {
+data class User(
+        @Id
+        @GeneratedValue(strategy = GenerationType.AUTO)
+        val id: Long = 0L,
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+        @Column
+        val username: String,
 
-    @Column
-    private String username;
+        @Column
+        val email: String,
 
-    @Column
-    private String email;
-
-    @Column
-    private String password;
-
-    public User(String username, String email, String password) {
-        this.username = username;
-        this.email = email;
-        this.password = password;
-    }
-
-    public UserResponseDTO toDTO() {
-        return new UserResponseDTO(id, username, email);
+        @Column
+        val password: String
+) {
+    fun toDTO(): UserResponseDTO {
+        return UserResponseDTO(id, username, email)
     }
 }
