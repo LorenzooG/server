@@ -8,7 +8,7 @@ import org.springframework.web.reactive.config.WebFluxConfigurer
  * Sets up the common webflux configuration
  */
 @Configuration
-class WebfluxConfiguration : WebFluxConfigurer {
+class WebFluxConfiguration : WebFluxConfigurer {
     override fun addResourceHandlers(registry: ResourceHandlerRegistry) {
         /** adds swagger ui handler to make work */
         registry.addResourceHandler("/swagger-ui.html**")
